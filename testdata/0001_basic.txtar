@@ -1,0 +1,30 @@
+-- input.go --
+package pkg
+
+type S struct{
+	FieldA string
+}
+
+func (s *S) PtrMethod(){}
+func (s S) Method(){}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"fields": [
+			{
+				"name": "FieldA",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod"
+			},
+			{
+				"name": "Method"
+			}
+		]
+	}
+]

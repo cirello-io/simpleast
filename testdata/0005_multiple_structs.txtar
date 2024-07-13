@@ -1,0 +1,180 @@
+-- input.go --
+package pkg
+
+// S3 is a struct
+type S3 struct{
+	// FieldA is a field
+	FieldA string `json:"field_a"`
+
+	// FieldB is a field
+	FieldB string
+}
+
+// S1 is a struct
+type S1 struct{
+	// FieldA is a field
+	FieldA string `json:"field_a"`
+
+	// FieldB is a field
+	FieldB string
+}
+
+// PtrMethod is a pointer method (S1)
+func (s *S1) PtrMethod(a string){}
+
+// PtrMethod is a pointer method (S3)
+func (s *S3) PtrMethod(a string){}
+
+// Method is a method (S1)
+func (s S1) Method(a string)(string){return ""}
+
+// S2 is a struct
+type S2 struct{
+	// FieldA is a field
+	FieldA string `json:"field_a"`
+
+	// FieldB is a field
+	FieldB string
+}
+
+// PtrMethod is a pointer method (S2)
+func (s *S2) PtrMethod(a string){}
+
+// Method is a method (S3)
+func (s S3) Method(a string)(string){return ""}
+
+// Method is a method (S2)
+func (s S2) Method(a string)(string){return ""}
+
+-- expected.go --
+[
+	{
+		"name": "S3",
+		"fields": [
+			{
+				"name": "FieldA",
+				"doc_comment": "FieldA is a field\n",
+				"type": "string",
+				"tags": "`json:\"field_a\"`"
+			},
+			{
+				"name": "FieldB",
+				"doc_comment": "FieldB is a field\n",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod",
+				"doc_comment": "PtrMethod is a pointer method (S3)\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				]
+			},
+			{
+				"name": "Method",
+				"doc_comment": "Method is a method (S3)\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				],
+				"results": [
+					{
+						"type": "string"
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "S1",
+		"fields": [
+			{
+				"name": "FieldA",
+				"doc_comment": "FieldA is a field\n",
+				"type": "string",
+				"tags": "`json:\"field_a\"`"
+			},
+			{
+				"name": "FieldB",
+				"doc_comment": "FieldB is a field\n",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod",
+				"doc_comment": "PtrMethod is a pointer method (S1)\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				]
+			},
+			{
+				"name": "Method",
+				"doc_comment": "Method is a method (S1)\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				],
+				"results": [
+					{
+						"type": "string"
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "S2",
+		"fields": [
+			{
+				"name": "FieldA",
+				"doc_comment": "FieldA is a field\n",
+				"type": "string",
+				"tags": "`json:\"field_a\"`"
+			},
+			{
+				"name": "FieldB",
+				"doc_comment": "FieldB is a field\n",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod",
+				"doc_comment": "PtrMethod is a pointer method (S2)\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				]
+			},
+			{
+				"name": "Method",
+				"doc_comment": "Method is a method (S2)\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				],
+				"results": [
+					{
+						"type": "string"
+					}
+				]
+			}
+		]
+	}
+]

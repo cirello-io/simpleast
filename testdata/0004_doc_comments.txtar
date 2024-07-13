@@ -1,0 +1,64 @@
+-- input.go --
+package pkg
+
+// S is a struct
+type S struct{
+	// FieldA is a field
+	FieldA string `json:"field_a"`
+
+	// FieldB is a field
+	FieldB string
+}
+
+// PtrMethod is a pointer method
+func (s *S) PtrMethod(a string){}
+
+// Method is a method
+func (s S) Method(a string)(string){return ""}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"fields": [
+			{
+				"name": "FieldA",
+				"doc_comment": "FieldA is a field\n",
+				"type": "string",
+				"tags": "`json:\"field_a\"`"
+			},
+			{
+				"name": "FieldB",
+				"doc_comment": "FieldB is a field\n",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod",
+				"doc_comment": "PtrMethod is a pointer method\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				]
+			},
+			{
+				"name": "Method",
+				"doc_comment": "Method is a method\n",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				],
+				"results": [
+					{
+						"type": "string"
+					}
+				]
+			}
+		]
+	}
+]

@@ -1,0 +1,53 @@
+-- input.go --
+package pkg
+
+type S struct{
+	FieldA string `json:"field_a"`
+	FieldB string
+}
+
+func (s *S) PtrMethod(a string){}
+func (s S) Method(a string)(string){return ""}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"fields": [
+			{
+				"name": "FieldA",
+				"type": "string",
+				"tags": "`json:\"field_a\"`"
+			},
+			{
+				"name": "FieldB",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				]
+			},
+			{
+				"name": "Method",
+				"parameters": [
+					{
+						"name": "a",
+						"type": "string"
+					}
+				],
+				"results": [
+					{
+						"type": "string"
+					}
+				]
+			}
+		]
+	}
+]
