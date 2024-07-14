@@ -25,7 +25,12 @@ func (s S) Method(a string)(string){return ""}
 				"name": "FieldA",
 				"doc_comment": "FieldA is a field\n",
 				"type": "string",
-				"tags": "`json:\"field_a\"`"
+				"tags": [
+					{
+						"name": "json",
+						"value": "field_a"
+					}
+				]
 			},
 			{
 				"name": "FieldB",

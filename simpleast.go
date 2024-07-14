@@ -9,6 +9,8 @@ import (
 	"go/token"
 	"io"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 // Struct represents a Go struct. Fields and Methods are not ordered.
@@ -21,10 +23,16 @@ type Struct struct {
 
 // Field represents a Go field of Struct.
 type Field struct {
-	Name       string `json:"name,omitempty"`
-	DocComment string `json:"doc_comment,omitempty"`
-	Type       string `json:"type,omitempty"`
-	Tags       string `json:"tags,omitempty"`
+	Name       string      `json:"name,omitempty"`
+	DocComment string      `json:"doc_comment,omitempty"`
+	Type       string      `json:"type,omitempty"`
+	Tags       []StructTag `json:"tags,omitempty"`
+}
+
+// StructTag represents a Go struct field tag.
+type StructTag struct {
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // Method represents a Go method of Struct.
@@ -107,7 +115,7 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 					Name:       fieldName.Name,
 					DocComment: fieldComment,
 					Type:       expressionString(field.Type),
-					Tags:       fieldTags,
+					Tags:       parseFieldTags(fieldTags),
 				})
 			}
 		}
@@ -165,4 +173,47 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 		})
 	}
 	return methods
+}
+
+func parseFieldTags(tags string) []StructTag {
+	// A StructTag is the tag string in a struct field.
+	//
+	// By convention, tag strings are a concatenation of
+	// optionally space-separated key:"value" pairs.
+	// Each key is a non-empty string consisting of non-control
+	// characters other than space (U+0020 ' '), quote (U+0022 '"'),
+	// and colon (U+003A ':').  Each value is quoted using U+0022 '"'
+	// characters and Go string literal syntax.
+
+	tags = strings.Trim(tags, "`")
+	tags = strings.TrimLeft(tags, " ")
+	var structTags []StructTag
+	currentTag := StructTag{}
+	for tags != "" {
+		colonDivider := strings.Index(tags, ":")
+		if colonDivider == -1 {
+			break
+		}
+		name := tags[:colonDivider]
+		currentTag.Name = name
+		tags = tags[colonDivider+1:]
+		insideQuotes := false
+		for i := 0; i < len(tags); i++ {
+			if !insideQuotes && tags[i] == '"' {
+				insideQuotes = true
+			} else if insideQuotes && tags[i] == '\\' {
+				i++
+			} else if insideQuotes && tags[i] == '"' {
+				v, err := strconv.Unquote(tags[:i+1])
+				if err != nil {
+					break
+				}
+				currentTag.Value = v
+				tags = strings.TrimLeft(tags[i+1:], " ")
+				structTags = append(structTags, currentTag)
+				currentTag = StructTag{}
+			}
+		}
+	}
+	return structTags
 }

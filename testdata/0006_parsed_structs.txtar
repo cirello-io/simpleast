@@ -1,0 +1,25 @@
+-- input.go --
+package pkg
+
+type S struct {
+	FieldA string `json:"field\"_a"`
+}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"fields": [
+			{
+				"name": "FieldA",
+				"type": "string",
+				"tags": [
+					{
+						"name": "json",
+						"value": "field\"_a"
+					}
+				]
+			}
+		]
+	}
+]
