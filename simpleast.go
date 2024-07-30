@@ -17,6 +17,7 @@ import (
 type Struct struct {
 	Name       string   `json:"name,omitempty"`
 	DocComment string   `json:"doc_comment,omitempty"`
+	TypeParams []Field  `json:"type_params,omitempty"`
 	Fields     []Field  `json:"fields,omitempty"`
 	Methods    []Method `json:"methods,omitempty"`
 }
@@ -37,10 +38,11 @@ type StructTag struct {
 
 // Method represents a Go method of Struct.
 type Method struct {
-	Name       string  `json:"name,omitempty"`
-	DocComment string  `json:"doc_comment,omitempty"`
-	Parameters []Field `json:"parameters,omitempty"`
-	Results    []Field `json:"results,omitempty"`
+	Name       string   `json:"name,omitempty"`
+	DocComment string   `json:"doc_comment,omitempty"`
+	TypeParams []string `json:"type_params,omitempty"`
+	Parameters []Field  `json:"parameters,omitempty"`
+	Results    []Field  `json:"results,omitempty"`
 
 	structName string
 }
@@ -119,9 +121,21 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 				})
 			}
 		}
+		typeParams := []Field{}
+		if typeSpec.TypeParams != nil {
+			for _, field := range typeSpec.TypeParams.List {
+				for _, name := range field.Names {
+					typeParams = append(typeParams, Field{
+						Name: name.Name,
+						Type: expressionString(field.Type),
+					})
+				}
+			}
+		}
 		structs = append(structs, &Struct{
 			Name:       typeSpec.Name.Name,
 			DocComment: typeSpec.Doc.Text(),
+			TypeParams: typeParams,
 			Fields:     fields,
 			Methods:    []Method{},
 		})
@@ -136,16 +150,37 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 	}
 	for _, recv := range decl.Recv.List {
 		structName := ""
+		typeParamsExpr := []ast.Expr{}
 		switch t := recv.Type.(type) {
 		case *ast.StarExpr:
 			if ident, ok := t.X.(*ast.Ident); ok {
 				structName = ident.Name
+			} else if indexList, ok := t.X.(*ast.IndexListExpr); ok {
+				if ident, ok := indexList.X.(*ast.Ident); ok {
+					structName = ident.Name
+				}
+				typeParamsExpr = indexList.Indices
 			}
+
 		case *ast.Ident:
 			structName = t.Name
+		case *ast.IndexListExpr:
+			if ident, ok := t.X.(*ast.Ident); ok {
+				structName = ident.Name
+			}
+			typeParamsExpr = t.Indices
+		default:
+			fmt.Printf("%T", t)
+			panic("oops")
 		}
 		if structName == "" {
 			continue
+		}
+		typeParams := []string{}
+		for _, index := range typeParamsExpr {
+			if ident, ok := index.(*ast.Ident); ok {
+				typeParams = append(typeParams, ident.Name)
+			}
 		}
 		params := []Field{}
 		for _, param := range decl.Type.Params.List {
@@ -168,6 +203,7 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 			structName: structName,
 			Name:       decl.Name.Name,
 			DocComment: decl.Doc.Text(),
+			TypeParams: typeParams,
 			Parameters: params,
 			Results:    returns,
 		})

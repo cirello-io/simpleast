@@ -1,0 +1,52 @@
+-- input.go --
+package pkg
+
+type S[T,U any, V comparable] struct{
+        FieldA string
+}
+
+func (s *S[T,U]) PtrMethod(){}
+func (s S[T,U]) Method(){}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"type_params": [
+			{
+				"name": "T",
+				"type": "any"
+			},
+			{
+				"name": "U",
+				"type": "any"
+			},
+			{
+				"name": "V",
+				"type": "comparable"
+			}
+		],
+		"fields": [
+			{
+				"name": "FieldA",
+				"type": "string"
+			}
+		],
+		"methods": [
+			{
+				"name": "PtrMethod",
+				"type_params": [
+					"T",
+					"U"
+				]
+			},
+			{
+				"name": "Method",
+				"type_params": [
+					"T",
+					"U"
+				]
+			}
+		]
+	}
+]
