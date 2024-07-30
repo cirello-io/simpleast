@@ -160,6 +160,11 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 					structName = ident.Name
 				}
 				typeParamsExpr = indexList.Indices
+			} else if index, ok := t.X.(*ast.IndexExpr); ok {
+				if ident, ok := index.X.(*ast.Ident); ok {
+					structName = ident.Name
+				}
+				typeParamsExpr = []ast.Expr{index.Index}
 			}
 
 		case *ast.Ident:
@@ -169,9 +174,11 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 				structName = ident.Name
 			}
 			typeParamsExpr = t.Indices
-		default:
-			fmt.Printf("%T", t)
-			panic("oops")
+		case *ast.IndexExpr:
+			if ident, ok := t.X.(*ast.Ident); ok {
+				structName = ident.Name
+			}
+			typeParamsExpr = []ast.Expr{t.Index}
 		}
 		if structName == "" {
 			continue
