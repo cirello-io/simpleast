@@ -1,0 +1,34 @@
+-- input.go --
+package pkg
+
+type S[T any] struct{}
+
+func (a S[T]) Method() {}
+func (a *S[T]) PtrMethod() {}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"type_params": [
+			{
+				"name": "T",
+				"type": "any"
+			}
+		],
+		"methods": [
+			{
+				"name": "Method",
+				"type_params": [
+					"T"
+				]
+			},
+			{
+				"name": "PtrMethod",
+				"type_params": [
+					"T"
+				]
+			}
+		]
+	}
+]
