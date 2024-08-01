@@ -53,3 +53,15 @@ func TestExtractStructs(t *testing.T) {
 		})
 	}
 }
+
+func TestStructTags(t *testing.T) {
+	st := StructTags{
+		StructTag{Name: "json", Value: "name,omitempty"},
+	}
+	if st.Get("json") != "name,omitempty" {
+		t.Fatalf("unexpected value: %s", st.Get("json"))
+	}
+	if st.Get("other") != "" {
+		t.Fatalf("unexpected value: %s", st.Get("other"))
+	}
+}

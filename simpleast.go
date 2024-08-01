@@ -24,10 +24,21 @@ type Struct struct {
 
 // Field represents a Go field of Struct.
 type Field struct {
-	Name       string      `json:"name,omitempty"`
-	DocComment string      `json:"doc_comment,omitempty"`
-	Type       string      `json:"type,omitempty"`
-	Tags       []StructTag `json:"tags,omitempty"`
+	Name       string     `json:"name,omitempty"`
+	DocComment string     `json:"doc_comment,omitempty"`
+	Type       string     `json:"type,omitempty"`
+	Tags       StructTags `json:"tags,omitempty"`
+}
+
+type StructTags []StructTag
+
+func (st StructTags) Get(name string) string {
+	for _, tag := range st {
+		if tag.Name == name {
+			return tag.Value
+		}
+	}
+	return ""
 }
 
 // StructTag represents a Go struct field tag.
@@ -218,7 +229,7 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 	return methods
 }
 
-func parseFieldTags(tags string) []StructTag {
+func parseFieldTags(tags string) StructTags {
 	// A StructTag is the tag string in a struct field.
 	//
 	// By convention, tag strings are a concatenation of
@@ -230,7 +241,7 @@ func parseFieldTags(tags string) []StructTag {
 
 	tags = strings.Trim(tags, "`")
 	tags = strings.TrimLeft(tags, " ")
-	var structTags []StructTag
+	var structTags StructTags
 	currentTag := StructTag{}
 	for tags != "" {
 		colonDivider := strings.Index(tags, ":")
