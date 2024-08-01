@@ -1,0 +1,45 @@
+-- input.go --
+package pkg
+
+import "testing"
+
+type S struct {
+	A int
+	B *int
+	C *testing.T
+	D testing.TB
+	E []any
+	F func()
+}
+
+-- expected.go --
+[
+	{
+		"name": "S",
+		"fields": [
+			{
+				"name": "A",
+				"type": "int"
+			},
+			{
+				"name": "B",
+				"type": "*int"
+			},
+			{
+				"name": "C",
+				"type": "*testing.T"
+			},
+			{
+				"name": "D",
+				"type": "testing.TB"
+			},
+			{
+				"name": "E",
+				"type": "[]any"
+			},
+			{
+				"name": "F"
+			}
+		]
+	}
+]

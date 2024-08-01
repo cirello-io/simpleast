@@ -1,0 +1,9 @@
+-- input.go --
+package pkg
+
+type Interface interface {
+        A()
+}
+
+-- expected.go --
+null

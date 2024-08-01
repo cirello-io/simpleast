@@ -1,0 +1,7 @@
+-- input.go --
+package pkg
+
+func (s B Method(){}
+
+-- expected.go --
+parse file: 3:11: missing ',' in parameter list (and 12 more errors)

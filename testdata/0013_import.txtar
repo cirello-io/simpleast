@@ -1,0 +1,7 @@
+-- input.go --
+package pkg
+
+import _ "testing"
+
+-- expected.go --
+null

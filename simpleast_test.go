@@ -3,8 +3,10 @@ package simpleast
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/fs"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"golang.org/x/tools/txtar"
@@ -36,7 +38,10 @@ func TestExtractStructs(t *testing.T) {
 
 			structs, err := ParseStructs(input)
 			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
+				if strings.TrimSpace(expected) != err.Error() {
+					t.Fatalf("expected:\n%s\ngot:\n%s", expected, err.Error())
+				}
+				return
 			}
 
 			var got bytes.Buffer
@@ -64,4 +69,17 @@ func TestStructTags(t *testing.T) {
 	if st.Get("other") != "" {
 		t.Fatalf("unexpected value: %s", st.Get("other"))
 	}
+}
+
+func TestBadReader(t *testing.T) {
+	_, err := ParseStructs(&badReader{})
+	if err == nil {
+		t.Fatalf("expected error")
+	}
+}
+
+type badReader struct{}
+
+func (*badReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("error")
 }

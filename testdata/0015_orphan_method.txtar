@@ -1,0 +1,7 @@
+-- input.go --
+package pkg
+
+func (s B) Method(){}
+
+-- expected.go --
+null

@@ -1,0 +1,7 @@
+-- input.go --
+package pkg
+
+func A() {}
+
+-- expected.go --
+null

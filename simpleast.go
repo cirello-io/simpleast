@@ -191,9 +191,6 @@ func parseASTFuncDecl(decl *ast.FuncDecl) []Method {
 			}
 			typeParamsExpr = []ast.Expr{t.Index}
 		}
-		if structName == "" {
-			continue
-		}
 		typeParams := []string{}
 		for _, index := range typeParamsExpr {
 			if ident, ok := index.(*ast.Ident); ok {
