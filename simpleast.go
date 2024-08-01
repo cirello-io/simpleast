@@ -78,6 +78,10 @@ func ParseStructs(r io.Reader) ([]*Struct, error) {
 			for _, receiver := range receivers {
 				idx := slices.IndexFunc(structs, func(s *Struct) bool { return s.Name == receiver.structName })
 				if idx == -1 {
+					structs = append(structs, &Struct{
+						Name:    receiver.structName,
+						Methods: []Method{receiver},
+					})
 					continue
 				}
 				structs[idx].Methods = append(structs[idx].Methods, receiver)

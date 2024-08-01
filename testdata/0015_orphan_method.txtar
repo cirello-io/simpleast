@@ -1,7 +1,20 @@
 -- input.go --
 package pkg
 
+func (s *B) PtrMethod(){}
 func (s B) Method(){}
 
 -- expected.go --
-null
+[
+	{
+		"name": "B",
+		"methods": [
+			{
+				"name": "PtrMethod"
+			},
+			{
+				"name": "Method"
+			}
+		]
+	}
+]
