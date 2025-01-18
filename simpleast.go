@@ -72,6 +72,14 @@ func ParseStructs(r io.Reader) ([]*Struct, error) {
 	ast.Inspect(f, func(n ast.Node) bool {
 		switch decl := n.(type) {
 		case *ast.GenDecl:
+			isSingleTypeGroup := len(decl.Specs) == 1
+			hasOneDocGroup := decl.Doc != nil && len(decl.Doc.List) == 1
+			if isSingleTypeGroup && hasOneDocGroup {
+				typeSpec, isTypeSpec := decl.Specs[0].(*ast.TypeSpec)
+				if isTypeSpec && typeSpec.Doc == nil {
+					typeSpec.Doc = decl.Doc
+				}
+			}
 			structs = append(structs, parseASTSpecs(decl.Specs)...)
 		case *ast.FuncDecl:
 			receivers := parseASTFuncDecl(decl)

@@ -1,14 +1,20 @@
 -- input.go --
 package pkg
 
-// S is a struct
-type S struct{
-	// FieldA is a field
-	FieldA string `json:"field_a"`
+type (
+	// S is a struct
+	S struct{
+		// FieldA is a field
+		FieldA string `json:"field_a"`
 
-	// FieldB is a field
-	FieldB string
-}
+		// FieldB is a field
+		FieldB string
+	}
+
+	// T is a struct too
+	T struct {
+	}
+)
 
 // PtrMethod is a pointer method
 func (s *S) PtrMethod(a string){}
@@ -16,10 +22,14 @@ func (s *S) PtrMethod(a string){}
 // Method is a method
 func (s S) Method(a string)(string){return ""}
 
+// U is a struct not in a group.
+type U struct{}
+
 -- expected.go --
 [
 	{
 		"name": "S",
+		"doc_comment": "S is a struct\n",
 		"fields": [
 			{
 				"name": "FieldA",
@@ -65,5 +75,13 @@ func (s S) Method(a string)(string){return ""}
 				]
 			}
 		]
+	},
+	{
+		"name": "T",
+		"doc_comment": "T is a struct too\n"
+	},
+	{
+		"name": "U",
+		"doc_comment": "U is a struct not in a group.\n"
 	}
 ]
