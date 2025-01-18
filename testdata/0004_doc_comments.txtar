@@ -2,7 +2,8 @@
 package pkg
 
 type (
-	// S is a struct
+	// S is a struct.
+	// Two line comment.
 	S struct{
 		// FieldA is a field
 		FieldA string `json:"field_a"`
@@ -23,13 +24,14 @@ func (s *S) PtrMethod(a string){}
 func (s S) Method(a string)(string){return ""}
 
 // U is a struct not in a group.
+// Two line comment.
 type U struct{}
 
 -- expected.go --
 [
 	{
 		"name": "S",
-		"doc_comment": "S is a struct\n",
+		"doc_comment": "S is a struct.\nTwo line comment.\n",
 		"fields": [
 			{
 				"name": "FieldA",
@@ -82,6 +84,6 @@ type U struct{}
 	},
 	{
 		"name": "U",
-		"doc_comment": "U is a struct not in a group.\n"
+		"doc_comment": "U is a struct not in a group.\nTwo line comment.\n"
 	}
 ]
