@@ -50,6 +50,7 @@ func (s S2) Method(a string)(string){return ""}
 [
 	{
 		"name": "S3",
+		"doc_comment": "S3 is a struct\n",
 		"fields": [
 			{
 				"name": "FieldA",
@@ -98,6 +99,7 @@ func (s S2) Method(a string)(string){return ""}
 	},
 	{
 		"name": "S1",
+		"doc_comment": "S1 is a struct\n",
 		"fields": [
 			{
 				"name": "FieldA",
@@ -146,6 +148,7 @@ func (s S2) Method(a string)(string){return ""}
 	},
 	{
 		"name": "S2",
+		"doc_comment": "S2 is a struct\n",
 		"fields": [
 			{
 				"name": "FieldA",
