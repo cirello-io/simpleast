@@ -20,6 +20,7 @@ type Struct struct {
 	TypeParams []Field  `json:"type_params,omitempty"`
 	Fields     []Field  `json:"fields,omitempty"`
 	Methods    []Method `json:"methods,omitempty"`
+	Alias      string   `json:"alias,omitempty"`
 }
 
 // Field represents a Go field of Struct.
@@ -124,53 +125,59 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 		if !ok {
 			continue
 		}
-		structType, ok := typeSpec.Type.(*ast.StructType)
-		if !ok {
-			continue
-		}
-		fields := []Field{}
-		for _, field := range structType.Fields.List {
-			fieldTags := ""
-			if field.Tag != nil {
-				fieldTags = field.Tag.Value
-			}
-			fieldComment := field.Doc.Text()
-			if len(field.Names) > 0 {
-				for _, fieldName := range field.Names {
+		switch v := typeSpec.Type.(type) {
+		case *ast.StructType:
+			structType := v
+			fields := []Field{}
+			for _, field := range structType.Fields.List {
+				fieldTags := ""
+				if field.Tag != nil {
+					fieldTags = field.Tag.Value
+				}
+				fieldComment := field.Doc.Text()
+				if len(field.Names) > 0 {
+					for _, fieldName := range field.Names {
+						fields = append(fields, Field{
+							Name:       fieldName.Name,
+							DocComment: fieldComment,
+							Type:       expressionString(field.Type),
+							Tags:       parseFieldTags(fieldTags),
+						})
+					}
+				} else {
 					fields = append(fields, Field{
-						Name:       fieldName.Name,
+						Name:       "",
 						DocComment: fieldComment,
 						Type:       expressionString(field.Type),
 						Tags:       parseFieldTags(fieldTags),
 					})
 				}
-			} else {
-				fields = append(fields, Field{
-					Name:       "",
-					DocComment: fieldComment,
-					Type:       expressionString(field.Type),
-					Tags:       parseFieldTags(fieldTags),
-				})
 			}
-		}
-		typeParams := []Field{}
-		if typeSpec.TypeParams != nil {
-			for _, field := range typeSpec.TypeParams.List {
-				for _, name := range field.Names {
-					typeParams = append(typeParams, Field{
-						Name: name.Name,
-						Type: expressionString(field.Type),
-					})
+			typeParams := []Field{}
+			if typeSpec.TypeParams != nil {
+				for _, field := range typeSpec.TypeParams.List {
+					for _, name := range field.Names {
+						typeParams = append(typeParams, Field{
+							Name: name.Name,
+							Type: expressionString(field.Type),
+						})
+					}
 				}
 			}
+			structs = append(structs, &Struct{
+				Name:       typeSpec.Name.Name,
+				DocComment: typeSpec.Doc.Text(),
+				TypeParams: typeParams,
+				Fields:     fields,
+				Methods:    []Method{},
+			})
+		case *ast.Ident:
+			structs = append(structs, &Struct{
+				Name:       typeSpec.Name.Name,
+				DocComment: typeSpec.Doc.Text(),
+				Alias:      v.Name,
+			})
 		}
-		structs = append(structs, &Struct{
-			Name:       typeSpec.Name.Name,
-			DocComment: typeSpec.Doc.Text(),
-			TypeParams: typeParams,
-			Fields:     fields,
-			Methods:    []Method{},
-		})
 	}
 	return structs
 }
