@@ -135,9 +135,18 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 				fieldTags = field.Tag.Value
 			}
 			fieldComment := field.Doc.Text()
-			for _, fieldName := range field.Names {
+			if len(field.Names) > 0 {
+				for _, fieldName := range field.Names {
+					fields = append(fields, Field{
+						Name:       fieldName.Name,
+						DocComment: fieldComment,
+						Type:       expressionString(field.Type),
+						Tags:       parseFieldTags(fieldTags),
+					})
+				}
+			} else {
 				fields = append(fields, Field{
-					Name:       fieldName.Name,
+					Name:       "",
 					DocComment: fieldComment,
 					Type:       expressionString(field.Type),
 					Tags:       parseFieldTags(fieldTags),
