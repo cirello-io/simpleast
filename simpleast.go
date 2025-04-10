@@ -11,6 +11,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 // Struct represents a Go struct. Fields and Methods are not ordered.
@@ -21,6 +23,7 @@ type Struct struct {
 	Fields     []Field  `json:"fields,omitempty"`
 	Methods    []Method `json:"methods,omitempty"`
 	Alias      string   `json:"alias,omitempty"`
+	Type       string   `json:"type,omitempty"`
 }
 
 // Field represents a Go field of Struct.
@@ -177,6 +180,14 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 				DocComment: typeSpec.Doc.Text(),
 				Alias:      v.Name,
 			})
+		case *ast.ArrayType:
+			structs = append(structs, &Struct{
+				Name:       typeSpec.Name.Name,
+				DocComment: typeSpec.Doc.Text(),
+				Type:       "[]" + v.Elt.(*ast.Ident).Name,
+			})
+		default:
+			spew.Dump(v)
 		}
 	}
 	return structs

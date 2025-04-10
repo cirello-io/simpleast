@@ -1,0 +1,26 @@
+-- input.go --
+package pkg
+
+type A struct{
+	field string
+}
+
+type B []A
+
+
+-- expected.go --
+[
+	{
+		"name": "A",
+		"fields": [
+			{
+				"name": "field",
+				"type": "string"
+			}
+		]
+	},
+	{
+		"name": "B",
+		"type": "[]A"
+	}
+]
