@@ -11,8 +11,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // Struct represents a Go struct. Fields and Methods are not ordered.
@@ -186,8 +184,6 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 				DocComment: typeSpec.Doc.Text(),
 				Type:       "[]" + v.Elt.(*ast.Ident).Name,
 			})
-		default:
-			spew.Dump(v)
 		}
 	}
 	return structs
