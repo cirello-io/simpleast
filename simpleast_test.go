@@ -130,3 +130,15 @@ func TestExtractConsts(t *testing.T) {
 		})
 	}
 }
+
+func TestExtractPackageName(t *testing.T) {
+	const src = "package pkgname\n"
+	expected := "pkgname"
+	pkgName, err := ExtractPackageName(strings.NewReader(src))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if pkgName != expected {
+		t.Fatalf("expected %s, got %s", expected, pkgName)
+	}
+}

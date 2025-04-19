@@ -364,3 +364,23 @@ func ParseConsts(r io.Reader) ([]*Const, error) {
 	})
 	return constants, nil
 }
+
+func ExtractPackageName(r io.Reader) (string, error) {
+	src, err := io.ReadAll(r)
+	if err != nil {
+		return "", fmt.Errorf("read file: %w", err)
+	}
+	f, err := parser.ParseFile(token.NewFileSet(), "", src, parser.AllErrors|parser.ParseComments)
+	if err != nil {
+		return "", fmt.Errorf("parse file: %w", err)
+	}
+	var pkgName string
+	ast.Inspect(f, func(n ast.Node) bool {
+		if pkg, ok := n.(*ast.File); ok {
+			pkgName = pkg.Name.String()
+			return false
+		}
+		return true
+	})
+	return pkgName, nil
+}
