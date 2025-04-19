@@ -179,11 +179,19 @@ func parseASTSpecs(specs []ast.Spec) []*Struct {
 				Methods:    []Method{},
 			})
 		case *ast.Ident:
-			structs = append(structs, &Struct{
-				Name:       typeSpec.Name.Name,
-				DocComment: typeSpec.Doc.Text(),
-				Alias:      v.Name,
-			})
+			if typeSpec.Assign.IsValid() {
+				structs = append(structs, &Struct{
+					Name:       typeSpec.Name.Name,
+					DocComment: typeSpec.Doc.Text(),
+					Alias:      v.Name,
+				})
+			} else {
+				structs = append(structs, &Struct{
+					Name:       typeSpec.Name.Name,
+					DocComment: typeSpec.Doc.Text(),
+					Type:       v.Name,
+				})
+			}
 		case *ast.ArrayType:
 			structs = append(structs, &Struct{
 				Name:       typeSpec.Name.Name,
