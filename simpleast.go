@@ -114,6 +114,12 @@ func expressionString(expr ast.Expr) string {
 		return "[]" + expressionString(e.Elt)
 	case *ast.MapType:
 		return "map[" + expressionString(e.Key) + "]" + expressionString(e.Value)
+	case *ast.BasicLit:
+		v, err := strconv.Unquote(e.Value)
+		if err != nil {
+			return e.Value
+		}
+		return v
 	default:
 		return ""
 	}
@@ -302,4 +308,51 @@ func parseFieldTags(tags string) StructTags {
 		}
 	}
 	return structTags
+}
+
+type Const struct {
+	Name       string `json:"name,omitempty"`
+	DocComment string `json:"doc_comment,omitempty"`
+	Type       string `json:"type,omitempty"`
+	Value      string `json:"value,omitempty"`
+}
+
+func ParseConsts(r io.Reader) ([]*Const, error) {
+	src, err := io.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("read file: %w", err)
+	}
+	f, err := parser.ParseFile(token.NewFileSet(), "", src, parser.AllErrors|parser.ParseComments)
+	if err != nil {
+		return nil, fmt.Errorf("parse file: %w", err)
+	}
+	var constants []*Const
+	ast.Inspect(f, func(n ast.Node) bool {
+		switch decl := n.(type) {
+		case *ast.GenDecl:
+			if decl.Tok != token.CONST {
+				return true
+			}
+			for _, spec := range decl.Specs {
+				valueSpec, ok := spec.(*ast.ValueSpec)
+				if !ok {
+					continue
+				}
+				docComment := valueSpec.Doc.Text()
+				for i, name := range valueSpec.Names {
+					if docComment == "" {
+						docComment = decl.Doc.Text()
+					}
+					constants = append(constants, &Const{
+						Name:       name.Name,
+						DocComment: docComment,
+						Type:       expressionString(valueSpec.Type),
+						Value:      expressionString(valueSpec.Values[i]),
+					})
+				}
+			}
+		}
+		return true
+	})
+	return constants, nil
 }

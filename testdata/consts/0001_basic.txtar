@@ -1,0 +1,27 @@
+-- input.go --
+package pkg
+
+type A string
+
+// Alpha comment
+const Alpha A = "alpha"
+
+// Bravo comment
+const Bravo A = "bravo"
+
+
+-- expected.go --
+[
+	{
+		"name": "Alpha",
+		"doc_comment": "Alpha comment\n",
+		"type": "A",
+		"value": "alpha"
+	},
+	{
+		"name": "Bravo",
+		"doc_comment": "Bravo comment\n",
+		"type": "A",
+		"value": "bravo"
+	}
+]
